@@ -1,0 +1,8 @@
+{
+  "name": "Blue Zenzer & Blue Ginger — Party Set Menu & Kitchen Booking",
+  "description": "Interactive party set menu builder and standardized kitchen event booking form generator for Blue Zenzer and Blue Ginger.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
