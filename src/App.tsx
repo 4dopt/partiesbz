@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   CheckCircle2,
   Copy,
+  Download,
   Lock,
   Mail,
   Printer,
@@ -34,6 +35,7 @@ import {
   generatePlainTextBookingEmail,
   getSelectedDesserts,
 } from './utils/bookingFormatter';
+import { downloadBookingPdf } from './utils/pdfGenerator';
 
 type AppTab = 'menu' | 'details' | 'form' | 'queue';
 
@@ -85,6 +87,7 @@ export default function App() {
   const [bookings, setBookings] = useState<SavedBooking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [copiedText, setCopiedText] = useState(false);
   const [venueEmail, setVenueEmail] = useState<string>(() => {
@@ -282,6 +285,19 @@ export default function App() {
     }
   };
 
+  const handleDownloadPdf = async (
+    targetId: string | null = lockedBookingId,
+    targetDetails: CustomerDetails = details,
+    targetSelection: MenuSelection = selection
+  ) => {
+    setDownloadingPdf(true);
+    try {
+      await downloadBookingPdf(targetId, targetDetails, targetSelection);
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   const handleLoadSanjayPreset = () => {
     setDetails(SANJAY_REFERENCE_PRESET.details);
     setSelection(SANJAY_REFERENCE_PRESET.selection);
@@ -429,13 +445,20 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() => (activeTab === 'form' ? window.print() : switchTab('form'))}
-              className="hidden md:inline-flex min-h-[40px] px-4 py-2 rounded-xl bg-[#25408F] text-white text-sm font-semibold hover:bg-[#1D3270] transition-colors items-center gap-2 whitespace-nowrap shrink-0 tabular-nums"
+              disabled={downloadingPdf && activeTab === 'form'}
+              onClick={() =>
+                activeTab === 'form' ? handleDownloadPdf() : switchTab('form')
+              }
+              className="hidden md:inline-flex min-h-[40px] px-4 py-2 rounded-xl bg-[#25408F] text-white text-sm font-semibold hover:bg-[#1D3270] disabled:opacity-60 transition-colors items-center gap-2 whitespace-nowrap shrink-0 tabular-nums"
             >
               {activeTab === 'form' ? (
                 <>
-                  <Printer className="w-4 h-4" />
-                  <span>Print · £{pricing.grandTotal.toFixed(2)}</span>
+                  <Download className="w-4 h-4" />
+                  <span>
+                    {downloadingPdf
+                      ? 'Saving PDF...'
+                      : `Save PDF · £${pricing.grandTotal.toFixed(2)}`}
+                  </span>
                 </>
               ) : (
                 <span>Total £{pricing.grandTotal.toFixed(2)} · Review</span>
@@ -649,11 +672,16 @@ export default function App() {
 
                   <button
                     type="button"
-                    onClick={() => handleEmailKitchen()}
-                    className="min-h-[44px] px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-semibold hover:bg-slate-50 transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                    disabled={downloadingPdf}
+                    onClick={() => handleDownloadPdf()}
+                    className={`min-h-[44px] px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-60 ${
+                      isLocked
+                        ? 'bg-[#25408F] text-white hover:bg-[#1D3270]'
+                        : 'border border-[#25408F] bg-[#EEF2FB] text-[#25408F] hover:bg-[#e1e9f8]'
+                    }`}
                   >
-                    <Mail className="w-4 h-4" />
-                    <span>Email to Restaurant</span>
+                    <Download className="w-4 h-4" />
+                    <span>{downloadingPdf ? 'Saving PDF...' : 'Save PDF'}</span>
                   </button>
 
                   <button
@@ -662,7 +690,16 @@ export default function App() {
                     className="min-h-[44px] px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-semibold hover:bg-slate-50 transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <Printer className="w-4 h-4" />
-                    <span>Print / Save PDF</span>
+                    <span>Print</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleEmailKitchen()}
+                    className="min-h-[44px] px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-semibold hover:bg-slate-50 transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Email to Restaurant</span>
                   </button>
 
                   <button
@@ -742,6 +779,10 @@ export default function App() {
               venueEmail={venueEmail}
               onChangeVenueEmail={updateVenueEmail}
               onOpenBooking={handleOpenSavedBooking}
+              onDownloadPdf={(b) => handleDownloadPdf(b.id, b.details, {
+                ...b.selection,
+                desserts: getSelectedDesserts(b.selection),
+              })}
               onUpdateStatus={handleUpdateBookingStatus}
               onDeleteBooking={handleDeleteBooking}
               onEmailBooking={(b) => handleEmailKitchen(b.id, b.details, b.selection)}
@@ -935,14 +976,25 @@ export default function App() {
             )}
 
             {activeTab === 'form' && (
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="min-h-[48px] px-5 py-3 rounded-xl bg-[#25408F] text-white text-sm font-bold hover:bg-[#1D3270] active:scale-[0.98] transition-all inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print / PDF</span>
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  aria-label="Print booking form"
+                  className="min-h-[48px] min-w-[48px] px-3 py-3 rounded-xl border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98] transition-all inline-flex items-center justify-center shrink-0"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  disabled={downloadingPdf}
+                  onClick={() => handleDownloadPdf()}
+                  className="min-h-[48px] px-4 py-3 rounded-xl bg-[#25408F] text-white text-sm font-bold hover:bg-[#1D3270] disabled:opacity-60 active:scale-[0.98] transition-all inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>{downloadingPdf ? 'Saving...' : 'Save PDF'}</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
