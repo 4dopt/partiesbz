@@ -154,8 +154,11 @@ export default function App() {
         `Pick at least ${MENU_PRICING.requiredMains} mains (${selection.mains.length}/4)`
       );
     }
-    if (getSelectedDesserts(selection).length < MENU_PRICING.requiredDesserts) {
-      missing.push('Pick 1 included dessert (0/1)');
+    const dessertsCount = getSelectedDesserts(selection).length;
+    if (dessertsCount < MENU_PRICING.requiredDesserts) {
+      missing.push(
+        `Pick ${MENU_PRICING.requiredDesserts} included desserts (${dessertsCount}/${MENU_PRICING.requiredDesserts})`
+      );
     }
     const totalGuests =
       Math.max(0, Number(details.adults) || 0) + Math.max(0, Number(details.kids) || 0);
@@ -510,11 +513,11 @@ export default function App() {
                   <p className="text-[15px] sm:text-base text-slate-600 leading-relaxed max-w-xl">
                     Choose any <strong className="text-slate-900">4 starters</strong>,{' '}
                     <strong className="text-slate-900">4 mains</strong>, and{' '}
-                    <strong className="text-slate-900">1 dessert</strong> for{' '}
+                    <strong className="text-slate-900">2 desserts</strong> for{' '}
                     <strong className="text-slate-900">£28 per adult</strong> and{' '}
                     <strong className="text-slate-900">£21 per child (5–10 yrs)</strong>. Minimum{' '}
                     <strong className="text-slate-900">{MENU_PRICING.minimumGuests} guests</strong>{' '}
-                    (adults &amp; kids combined). Add a 5th starter, 5th main, or 2nd dessert for{' '}
+                    (adults &amp; kids combined). Add a 5th starter or 5th main for{' '}
                     <strong className="text-slate-900">£1 extra per person</strong>.
                   </p>
                 </div>
@@ -684,9 +687,9 @@ export default function App() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
-                    {(selection.starters.length < 4 ||
-                      selection.mains.length < 4 ||
-                      getSelectedDesserts(selection).length < 1) && (
+                    {(selection.starters.length < MENU_PRICING.requiredStarters ||
+                      selection.mains.length < MENU_PRICING.requiredMains ||
+                      getSelectedDesserts(selection).length < MENU_PRICING.requiredDesserts) && (
                       <button
                         type="button"
                         onClick={() => switchTab('menu')}
@@ -818,7 +821,7 @@ export default function App() {
                 </div>
               )}
               <div className="flex justify-between gap-2">
-                <dt className="text-slate-700">1 Dessert</dt>
+                <dt className="text-slate-700">2 Desserts</dt>
                 <dd className="font-semibold text-emerald-700">Included Free</dd>
               </div>
               {pricing.drinksTotal > 0 && (

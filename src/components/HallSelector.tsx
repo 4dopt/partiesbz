@@ -1,11 +1,13 @@
-import React from 'react';
-import { AlertCircle, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertCircle, Check, PlayCircle } from 'lucide-react';
 import {
   MAX_VENUE_CAPACITY,
   VENUE_HALLS,
+  VenueHall,
   findVenueHall,
   getRecommendedHall,
 } from '../data/menuData';
+import { HallGalleryModal } from './HallGalleryModal';
 
 interface HallSelectorProps {
   selectedArea: string;
@@ -20,6 +22,7 @@ export const HallSelector: React.FC<HallSelectorProps> = ({
   disabled = false,
   onSelectHall,
 }) => {
+  const [previewHall, setPreviewHall] = useState<VenueHall | null>(null);
   const activeHall = findVenueHall(selectedArea);
   const recommendedHall = getRecommendedHall(totalGuests);
   const overMaxVenue = totalGuests > MAX_VENUE_CAPACITY;
@@ -42,59 +45,105 @@ export const HallSelector: React.FC<HallSelectorProps> = ({
           const isBestFit = !overMaxVenue && recommendedHall.id === hall.id;
           const isTightFit = !tooSmall && totalGuests > hall.recommendedMax;
           const isDisabled = disabled || tooSmall;
+          const coverPhoto = hall.photos[0];
 
           return (
-            <button
+            <div
               key={hall.id}
-              type="button"
-              disabled={isDisabled}
-              onClick={() => onSelectHall(hall.name)}
-              className={`text-left p-3.5 rounded-xl border transition-all duration-150 flex items-start justify-between gap-3 ${
+              className={`rounded-xl border transition-all duration-150 flex flex-col justify-between overflow-hidden ${
                 isSelected && !tooSmall
                   ? 'bg-[#EEF2FB] border-[#25408F] ring-1 ring-[#25408F]'
                   : tooSmall
-                  ? 'bg-slate-50 border-slate-200 opacity-55 cursor-not-allowed'
-                  : 'bg-white border-slate-200 hover:border-slate-400 hover:bg-slate-50/50'
+                  ? 'bg-slate-50 border-slate-200'
+                  : 'bg-white border-slate-200 hover:border-slate-400'
               }`}
             >
-              <div className="min-w-0 flex-1 space-y-0.5">
-                <div className="text-sm font-bold text-slate-900 leading-snug">
-                  {hall.name}
-                </div>
-                <div className="text-xs font-medium text-slate-700 tabular-nums">
-                  {hall.capacitySummary}
-                </div>
-                <div className="text-xs text-slate-600">{hall.recommendationNote}</div>
-                <div className="pt-1 text-xs font-semibold">
-                  {tooSmall ? (
-                    <span className="text-rose-700">
-                      Too small for {totalGuests} guests
-                    </span>
-                  ) : isTightFit ? (
-                    <span className="text-amber-800">
-                      Fits (above {hall.recommendedMax} recommended)
-                    </span>
-                  ) : isBestFit ? (
-                    <span className="text-[#25408F]">
-                      Recommended for {totalGuests} guests
-                    </span>
-                  ) : (
-                    <span className="text-emerald-700">Fits {totalGuests} guests</span>
-                  )}
-                </div>
-              </div>
-
-              <div
-                className={`w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center mt-0.5 transition-colors ${
-                  isSelected && !tooSmall
-                    ? 'bg-[#25408F] border-[#25408F] text-white'
-                    : 'border-slate-300 bg-white text-transparent'
+              {/* Selectable Hall Details Area */}
+              <button
+                type="button"
+                disabled={isDisabled}
+                onClick={() => onSelectHall(hall.name)}
+                className={`w-full text-left p-3.5 flex items-start justify-between gap-3 flex-1 transition-colors ${
+                  tooSmall
+                    ? 'opacity-60 cursor-not-allowed'
+                    : isSelected
+                    ? ''
+                    : 'hover:bg-slate-50/70'
                 }`}
-                aria-hidden="true"
               >
-                <Check className="w-4 h-4 stroke-[2.75]" />
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <div className="text-sm font-bold text-slate-900 leading-snug">
+                    {hall.name}
+                  </div>
+                  <div className="text-xs font-medium text-slate-700 tabular-nums">
+                    {hall.capacitySummary}
+                  </div>
+                  <div className="text-xs text-slate-600">{hall.recommendationNote}</div>
+                  <div className="pt-1 text-xs font-semibold">
+                    {tooSmall ? (
+                      <span className="text-rose-700">
+                        Too small for {totalGuests} guests
+                      </span>
+                    ) : isTightFit ? (
+                      <span className="text-amber-800">
+                        Fits (above {hall.recommendedMax} recommended)
+                      </span>
+                    ) : isBestFit ? (
+                      <span className="text-[#25408F]">
+                        Recommended for {totalGuests} guests
+                      </span>
+                    ) : (
+                      <span className="text-emerald-700">Fits {totalGuests} guests</span>
+                    )}
+                  </div>
+                </div>
+
+                <div
+                  className={`w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center mt-0.5 transition-colors ${
+                    isSelected && !tooSmall
+                      ? 'bg-[#25408F] border-[#25408F] text-white'
+                      : 'border-slate-300 bg-white text-transparent'
+                  }`}
+                  aria-hidden="true"
+                >
+                  <Check className="w-4 h-4 stroke-[2.75]" />
+                </div>
+              </button>
+
+              {/* Always-Accessible See Hall Bar (Photos & Videos) */}
+              <div
+                className={`px-3 py-2 border-t flex items-center justify-between gap-2.5 ${
+                  isSelected && !tooSmall
+                    ? 'border-[#25408F]/20 bg-white/70'
+                    : 'border-slate-200/80 bg-slate-50/80'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  {coverPhoto && (
+                    <div className="w-10 h-7 rounded-md overflow-hidden bg-slate-200 shrink-0 border border-slate-200">
+                      <img
+                        src={coverPhoto.src}
+                        alt={`${hall.name} preview`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <span className="text-xs text-slate-600 truncate">
+                    Photos &amp; video
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setPreviewHall(hall)}
+                  className="min-h-[36px] px-3 rounded-lg border border-slate-300 bg-white hover:border-[#25408F] hover:text-[#25408F] text-xs font-bold text-slate-800 flex items-center gap-1.5 shrink-0 transition-colors"
+                >
+                  <PlayCircle className="w-3.5 h-3.5 text-[#25408F]" />
+                  <span>See Hall</span>
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
@@ -109,6 +158,15 @@ export const HallSelector: React.FC<HallSelectorProps> = ({
           </span>
         </div>
       )}
+
+      <HallGalleryModal
+        hall={previewHall}
+        isSelected={previewHall ? activeHall?.id === previewHall.id : false}
+        totalGuests={totalGuests}
+        selectionDisabled={disabled}
+        onClose={() => setPreviewHall(null)}
+        onSelectHall={onSelectHall}
+      />
     </div>
   );
 };

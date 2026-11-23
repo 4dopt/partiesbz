@@ -159,11 +159,7 @@ export function generatePlainTextBookingEmail(
     .map((id) => getMenuItem(id)?.kitchenLabel)
     .filter(Boolean) as string[];
   const desserts = getSelectedDesserts(selection)
-    .map((id, idx) => {
-      const label = getMenuItem(id)?.kitchenLabel;
-      if (!label) return null;
-      return idx >= MENU_PRICING.requiredDesserts ? `${label} (Extra +£1/pp)` : label;
-    })
+    .map((id) => getMenuItem(id)?.kitchenLabel)
     .filter(Boolean) as string[];
   const accompaniments = buildAccompanimentLines(details, selection);
   const drinks = selection.drinks
@@ -204,7 +200,7 @@ export function generatePlainTextBookingEmail(
     'ACCOMPANIMENTS / SIDES',
     ...(accompaniments.length ? accompaniments : ['NA']),
     '',
-    'DESSERT (1 INCLUDED)',
+    'DESSERTS (2 INCLUDED)',
     ...(desserts.length ? desserts : ['None selected']),
     '',
     'DRINKS',
@@ -232,7 +228,7 @@ export function generatePlainTextBookingEmail(
     `Kids (5-10 yrs): ${details.kids} × £${MENU_PRICING.childPerPerson} = £${pricing.kidsTotal.toFixed(2)}`,
     ...(pricing.extraDishesCount > 0
       ? [
-          `Extra Dishes (Starter/Main/Dessert @ +£1/person each): ${pricing.extraDishesCount} extra × ${pricing.totalGuests} guests = £${pricing.extraDishesTotal.toFixed(2)}`,
+          `Extra Dishes (5th Starter/Main @ +£1/person each): ${pricing.extraDishesCount} extra × ${pricing.totalGuests} guests = £${pricing.extraDishesTotal.toFixed(2)}`,
         ]
       : []),
     `Drinks Package: ${details.drinksPackage}${

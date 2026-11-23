@@ -19,10 +19,16 @@ export const MENU_PRICING = {
   maxStarters: 5,
   maxMains: 5,
   extraDishPerPerson: 1,
-  requiredDesserts: 1,
+  requiredDesserts: 2,
   maxDesserts: 2,
   maxDrinks: 4,
 };
+
+export interface VenueHallPhoto {
+  src: string;
+  title: string;
+  caption: string;
+}
 
 export interface VenueHall {
   id: 'fairway-hall' | 'anthem-bar' | 'bunker-bar-hall';
@@ -31,6 +37,9 @@ export interface VenueHall {
   recommendedMax: number;
   capacitySummary: string;
   recommendationNote: string;
+  tagline: string;
+  highlights: string[];
+  photos: VenueHallPhoto[];
 }
 
 export const VENUE_HALLS: VenueHall[] = [
@@ -41,6 +50,21 @@ export const VENUE_HALLS: VenueHall[] = [
     recommendedMax: 55,
     capacitySummary: 'Max 60 guests',
     recommendationNote: 'Recommended for 50–55 guests',
+    tagline:
+      'Intimate golf-view dining hall with warm ambient lighting and a dedicated buffet setup for private family and corporate gatherings.',
+    highlights: ['Fairway views', 'Dedicated buffet counter', 'Round banquet seating'],
+    photos: [
+      {
+        src: new URL('../assets/images/hall_fairway_dining_1795114134268.jpg', import.meta.url).href,
+        title: 'Main Dining Room & Fairway Views',
+        caption: 'Warm round-table banquet layout overlooking the green golf course at golden hour.',
+      },
+      {
+        src: new URL('../assets/images/hall_fairway_buffet_1795114134347.jpg', import.meta.url).href,
+        title: 'Evening Buffet & Celebration Setup',
+        caption: 'Private evening party setup with dedicated buffet counter comfortably hosting 50–55 guests.',
+      },
+    ],
   },
   {
     id: 'anthem-bar',
@@ -49,6 +73,21 @@ export const VENUE_HALLS: VenueHall[] = [
     recommendedMax: 80,
     capacitySummary: '70–80 guests capacity',
     recommendationNote: 'Ideal for 56–80 guests',
+    tagline:
+      'Contemporary bar and lounge venue featuring a backlit bar, velvet booth seating, and terrace outlook for lively evening parties.',
+    highlights: ['Backlit private bar', 'Velvet booth & lounge seating', 'Terrace outlook'],
+    photos: [
+      {
+        src: new URL('../assets/images/hall_anthem_bar_1795114134651.jpg', import.meta.url).href,
+        title: 'Backlit Bar & Velvet Booths',
+        caption: 'Full-service backlit bar with plush navy booth seating and warm party lighting.',
+      },
+      {
+        src: new URL('../assets/images/hall_anthem_lounge_1795114134170.jpg', import.meta.url).href,
+        title: 'Cocktail Lounge & Terrace View',
+        caption: 'Open lounge and dining seating for 70–80 guests looking out toward the illuminated range.',
+      },
+    ],
   },
   {
     id: 'bunker-bar-hall',
@@ -57,6 +96,21 @@ export const VENUE_HALLS: VenueHall[] = [
     recommendedMax: 100,
     capacitySummary: 'Max 120 guests',
     recommendationNote: 'Recommended for up to 100 guests',
+    tagline:
+      'Our largest celebration hall with chandelier lighting, central dance floor space, and a private bar designed for milestone events.',
+    highlights: ['Central dance floor', 'Private bar & buffet line', 'Up to 120 guests'],
+    photos: [
+      {
+        src: new URL('../assets/images/hall_bunker_banquet_1795114134346.jpg', import.meta.url).href,
+        title: 'Grand Banquet Hall & Dance Floor',
+        caption: 'Spacious celebration hall with chandelier lighting, dance floor, and full banquet seating.',
+      },
+      {
+        src: new URL('../assets/images/hall_bunker_bar_setup_1795114133590.jpg', import.meta.url).href,
+        title: 'Private Bar & 100-Guest Setup',
+        caption: 'Dedicated private bar and generous dining layout recommended for parties up to 100 guests.',
+      },
+    ],
   },
 ];
 
@@ -905,7 +959,7 @@ export const MENU_ITEMS: MenuItem[] = [
   },
 
   // ==========================================
-  // DESSERTS (SELECT 1 — SAME PRICE)
+  // DESSERTS (SELECT 2 — INCLUDED AS DEFAULT)
   // ==========================================
   {
     id: 'bg-des-kulfi-pistachio',
@@ -1146,7 +1200,7 @@ export const SANJAY_REFERENCE_PRESET = {
       'bg-nvm-desi-chicken-curry',
       'bg-nvm-kadhai-lamb',
     ],
-    desserts: ['bg-des-gulab-jamun'],
+    desserts: ['bg-des-gulab-jamun', 'bz-des-ice-vanilla'],
     rice: 'bg-rice-pilao',
     side: 'bz-side-potato-chips',
     drinks: ['drink-coke', 'drink-lemonade', 'drink-pineapple-juice', 'drink-orange-juice'],

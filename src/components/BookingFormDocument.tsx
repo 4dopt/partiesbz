@@ -238,26 +238,25 @@ export const BookingFormDocument: React.FC<BookingFormDocumentProps> = ({
       <section className="print-page bg-white border border-slate-300 shadow-sm mx-auto max-w-[820px] p-4 sm:p-8 md:p-10 print:p-0 print:border-none overflow-hidden">
         <SheetHeader />
 
-        {/* Dessert */}
+        {/* Desserts */}
         <div className="mb-3.5 print:mb-2">
           <div className="text-[13px] font-semibold text-[#2B6CB0] mb-0.5 text-center booking-sheet-heading">
-            Dessert{pricing.extraDessertsCount > 0 ? ` (${desserts.length} Selected — +£${pricing.extraDessertsCount}/person extra)` : ' (Included)'}
+            Desserts (2 Included)
           </div>
           <table className="w-full border-collapse border border-black text-[12px] sm:text-[13.5px] print:text-[11.5px] booking-sheet-font text-center">
             <tbody>
               {desserts.length > 0 ? (
-                desserts.map((item, idx) => (
+                desserts.map((item) => (
                   <tr key={item.id}>
                     <td className="border border-black px-3 py-1.5 print:py-1 font-bold">
                       {item.kitchenLabel}
-                      {idx >= MENU_PRICING.requiredDesserts ? ' (Extra +£1/pp)' : ''}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td className="border border-black px-3 py-1.5 print:py-1 text-slate-400 italic">
-                    None selected (Select 1 dessert)
+                    None selected (Select 2 desserts)
                   </td>
                 </tr>
               )}

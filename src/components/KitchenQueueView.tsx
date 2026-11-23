@@ -70,7 +70,7 @@ export const KitchenQueueView: React.FC<KitchenQueueViewProps> = ({
           <div className="p-8 sm:p-12 text-center space-y-2">
             <div className="text-sm font-medium text-slate-800">No locked-in bookings yet</div>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Once a customer selects their 4 starters, 4 mains, and 1 dessert and clicks &quot;Lock In &amp; Submit Menu&quot;, their formatted booking sheet appears here ready to print or email to the kitchen.
+              Once a customer selects their 4 starters, 4 mains, and 2 desserts and clicks &quot;Lock In &amp; Submit Menu&quot;, their formatted booking sheet appears here ready to print or email to the kitchen.
             </p>
           </div>
         ) : (

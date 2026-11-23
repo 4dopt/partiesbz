@@ -41,6 +41,38 @@
   scrollbar-width: none;
 }
 
+@keyframes hall-walkthrough-pan-right {
+  0% {
+    transform: scale(1.02) translate3d(-1.5%, 0%, 0);
+  }
+  100% {
+    transform: scale(1.12) translate3d(1.5%, -1%, 0);
+  }
+}
+
+@keyframes hall-walkthrough-pan-left {
+  0% {
+    transform: scale(1.12) translate3d(1.5%, -1%, 0);
+  }
+  100% {
+    transform: scale(1.02) translate3d(-1.5%, 0.5%, 0);
+  }
+}
+
+.animate-hall-pan-a {
+  animation: hall-walkthrough-pan-right 6.5s ease-in-out forwards;
+  will-change: transform;
+}
+
+.animate-hall-pan-b {
+  animation: hall-walkthrough-pan-left 6.5s ease-in-out forwards;
+  will-change: transform;
+}
+
+.hall-pan-paused {
+  animation-play-state: paused;
+}
+
 /* Booking Form Document Typography (matching formal kitchen PDF sheet) */
 .booking-sheet-font {
   font-family: Georgia, "Times New Roman", Times, serif;

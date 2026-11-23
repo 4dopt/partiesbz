@@ -226,31 +226,6 @@ export const EventDetailsForm: React.FC<EventDetailsFormProps> = ({
               </div>
             </div>
 
-            {/* Hall Selection based on combined guest count */}
-            <div className="sm:col-span-2 pt-1">
-              <HallSelector
-                selectedArea={details.area}
-                totalGuests={pricing.totalGuests}
-                disabled={isLocked}
-                onSelectHall={(hallName) => update('area', hallName)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                Food Service Style
-              </label>
-              <select
-                disabled={isLocked}
-                value={details.serviceStyle}
-                onChange={(e) => update('serviceStyle', e.target.value as ServiceStyleOption)}
-                className="w-full px-3.5 py-2.5 min-h-[48px] text-base border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-[#25408F] disabled:bg-slate-50"
-              >
-                <option value="Buffet">Buffet (Self-serve table)</option>
-                <option value="Table Service">Table Service</option>
-              </select>
-            </div>
-
             <div>
               <label className="block text-sm font-semibold text-slate-800 mb-1.5">
                 Soft Drinks Package
@@ -268,6 +243,31 @@ export const EventDetailsForm: React.FC<EventDetailsFormProps> = ({
                 </option>
                 <option value="Not Included">No Drinks Package (Pay at bar)</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                Food Service Style
+              </label>
+              <select
+                disabled={isLocked}
+                value={details.serviceStyle}
+                onChange={(e) => update('serviceStyle', e.target.value as ServiceStyleOption)}
+                className="w-full px-3.5 py-2.5 min-h-[48px] text-base border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-[#25408F] disabled:bg-slate-50"
+              >
+                <option value="Buffet">Buffet (Self-serve table)</option>
+                <option value="Table Service">Table Service</option>
+              </select>
+            </div>
+
+            {/* Hall Selection based on combined guest count */}
+            <div className="sm:col-span-2 pt-1">
+              <HallSelector
+                selectedArea={details.area}
+                totalGuests={pricing.totalGuests}
+                disabled={isLocked}
+                onSelectHall={(hallName) => update('area', hallName)}
+              />
             </div>
 
             <div>
@@ -536,7 +536,7 @@ export const EventDetailsForm: React.FC<EventDetailsFormProps> = ({
             </dd>
           </div>
           <div className="flex justify-between gap-2">
-            <dt className="text-slate-700">1 Dessert</dt>
+            <dt className="text-slate-700">2 Desserts</dt>
             <dd className="font-semibold text-emerald-700">Included Free</dd>
           </div>
           {pricing.extraDishesCount > 0 && (

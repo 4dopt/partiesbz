@@ -258,21 +258,17 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
     const wouldCostExtra =
       !selected &&
       ((item.category === 'starter' && startersSelected >= MENU_PRICING.requiredStarters) ||
-        (item.category === 'main' && mainsSelected >= MENU_PRICING.requiredMains) ||
-        (item.category === 'dessert' && dessertSelected >= MENU_PRICING.requiredDesserts));
+        (item.category === 'main' && mainsSelected >= MENU_PRICING.requiredMains));
 
     const selectedIndex =
       item.category === 'starter'
         ? selection.starters.indexOf(item.id)
         : item.category === 'main'
         ? selection.mains.indexOf(item.id)
-        : item.category === 'dessert'
-        ? selectedDesserts.indexOf(item.id)
         : -1;
     const isExtraDish =
       (item.category === 'starter' && selectedIndex >= MENU_PRICING.requiredStarters) ||
-      (item.category === 'main' && selectedIndex >= MENU_PRICING.requiredMains) ||
-      (item.category === 'dessert' && selectedIndex >= MENU_PRICING.requiredDesserts);
+      (item.category === 'main' && selectedIndex >= MENU_PRICING.requiredMains);
 
     return (
       <button
@@ -379,7 +375,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
         </div>
       )}
       <div className="flex items-center justify-between text-sm text-slate-700">
-        <span>1 Dessert</span>
+        <span>2 Desserts</span>
         <span className="font-semibold text-emerald-700">Included</span>
       </div>
       {pricing.drinksTotal > 0 && (
@@ -429,7 +425,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
             Your Party Menu &amp; Cost
           </h3>
           <p className="text-sm text-slate-600 mt-0.5">
-            4 starters, 4 mains &amp; 1 dessert included. 5th starter/main or 2nd dessert is +£1/person.
+            4 starters, 4 mains &amp; 2 desserts included. 5th starter or main is +£1/person.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -570,18 +566,20 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
       {/* Dessert Slot */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
-          <span>Dessert (1 Included)</span>
+          <span>Desserts (2 Included)</span>
           <span
             className={`tabular-nums ${
-              dessertSelected >= 1 ? 'text-emerald-700' : 'text-[#25408F]'
+              dessertSelected >= MENU_PRICING.requiredDesserts
+                ? 'text-emerald-700'
+                : 'text-[#25408F]'
             }`}
           >
-            {dessertSelected} picked{pricing.extraDessertsCount > 0 ? ` (+${pricing.extraDessertsCount} extra)` : ' / 1'}
+            {dessertSelected} picked / {MENU_PRICING.requiredDesserts}
           </span>
         </div>
         {selectedDesserts.length > 0 ? (
           <ul className="space-y-1.5">
-            {selectedDesserts.map((id, idx) => {
+            {selectedDesserts.map((id) => {
               const item = getMenuItem(id);
               if (!item) return null;
               return (
@@ -589,10 +587,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
                   key={id}
                   className="flex items-center justify-between gap-2 text-sm font-medium text-slate-900 bg-slate-50 pl-3.5 pr-1 min-h-[44px] rounded-xl border border-slate-200"
                 >
-                  <span className="truncate py-1">
-                    {item.kitchenLabel}
-                    {idx >= MENU_PRICING.requiredDesserts ? ' (+£1/pp)' : ''}
-                  </span>
+                  <span className="truncate py-1">{item.kitchenLabel}</span>
                   {!isLocked && (
                     <button
                       type="button"
@@ -616,7 +611,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
             }}
             className="w-full min-h-[44px] text-left text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-xl px-3.5 py-2.5 hover:border-slate-400"
           >
-            Tap here to pick 1 dessert
+            Tap here to pick 2 desserts
           </button>
         )}
       </div>
@@ -669,7 +664,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
           onClick={() => setActiveCourse('dessert')}
           className="w-full sm:w-auto min-h-[48px] px-6 py-3 rounded-xl bg-[#25408F] text-white text-sm sm:text-base font-semibold hover:bg-[#1D3270] inline-flex items-center justify-center gap-2"
         >
-          <span>Next: Pick 1 Free Dessert</span>
+          <span>Next: Pick 2 Free Desserts</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       );
@@ -807,20 +802,10 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
           </div>
         )}
 
-        {/* Venue Hall Selector based on Guest Count */}
-        <div className="pt-4 border-t border-slate-100">
-          <HallSelector
-            selectedArea={details.area}
-            totalGuests={pricing.totalGuests}
-            disabled={isLocked}
-            onSelectHall={(hallName) => onChangeDetails({ ...details, area: hallName })}
-          />
-        </div>
-
         {/* Simple Soft Drinks + Optional Tea & Coffee Quick Toggles */}
         <div className="pt-4 border-t border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold text-slate-700 mr-1">Drinks:</span>
+            <span className="text-sm font-semibold text-slate-700 mr-1">Drinks Package:</span>
             {(
               [
                 { value: 'Included', label: 'Unlimited Soft Drinks (+£3/pp)' },
@@ -861,6 +846,16 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
             </span>
           </label>
         </div>
+
+        {/* Venue Hall Selector based on Guest Count */}
+        <div className="pt-4 border-t border-slate-100">
+          <HallSelector
+            selectedArea={details.area}
+            totalGuests={pricing.totalGuests}
+            disabled={isLocked}
+            onSelectHall={(hallName) => onChangeDetails({ ...details, area: hallName })}
+          />
+        </div>
       </section>
 
       {/* Mobile Inline Selection & Cost Card */}
@@ -878,7 +873,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
             <span aria-hidden="true">·</span>
             <span>Mains {mainsSelected}/4</span>
             <span aria-hidden="true">·</span>
-            <span>Dessert {dessertSelected}/1</span>
+            <span>Desserts {dessertSelected}/2</span>
           </div>
         </div>
         <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[#25408F] px-3.5 py-2.5 rounded-xl shrink-0">
@@ -914,8 +909,8 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
                 },
                 {
                   id: 'dessert',
-                  label: 'Dessert',
-                  count: `${dessertSelected}/1`,
+                  label: 'Desserts',
+                  count: `${dessertSelected}/2`,
                   done: dessertSelected >= MENU_PRICING.requiredDesserts,
                 },
                 {
@@ -963,7 +958,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
                   {activeCourse === 'starter' && 'Tap Any 4 Starters (Or Add a 5th)'}
                   {activeCourse === 'main' && 'Tap Any 4 Mains (Or Add a 5th)'}
                   {activeCourse === 'accompaniments' && 'Pick Rice, Side Order & Naan'}
-                  {activeCourse === 'dessert' && 'Tap 1 Dessert (Or Add a 2nd)'}
+                  {activeCourse === 'dessert' && 'Tap Any 2 Desserts'}
                   {activeCourse === 'drink' && 'Soft Drinks, Tea & Coffee'}
                 </h2>
                 <p className="text-sm sm:text-base text-slate-600 mt-1">
@@ -974,7 +969,7 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
                   {activeCourse === 'accompaniments' &&
                     'Pick 1 rice, 1 side order (like chips or salad), and optional traditional Indian accompaniments.'}
                   {activeCourse === 'dessert' &&
-                    '1 dessert is included in your £28/adult (£21/child) set price. Adding a 2nd dessert costs £1.00 extra per person.'}
+                    '2 desserts are included as standard in your £28/adult (£21/child) set price at no extra charge.'}
                   {activeCourse === 'drink' &&
                     'Unlimited soft drinks from the menu cost £3.00 extra per person. Tea & Coffee is £2.00 extra per person.'}
                 </p>
@@ -989,29 +984,24 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
                     ? `${mainsSelected} picked (${pricing.extraMainsCount > 0 ? `+£${pricing.extraMainsCount}/pp` : '4 included'})`
                     : `${4 - mainsSelected} more to pick`)}
                 {activeCourse === 'dessert' &&
-                  (dessertSelected >= 1
-                    ? `${dessertSelected} picked (${pricing.extraDessertsCount > 0 ? `+£${pricing.extraDessertsCount}/pp` : '1 included'})`
-                    : 'Pick 1 dessert')}
+                  (dessertSelected >= MENU_PRICING.requiredDesserts
+                    ? `${dessertSelected} picked (2 included)`
+                    : `${MENU_PRICING.requiredDesserts - dessertSelected} more to pick`)}
                 {activeCourse === 'drink' && `${selection.drinks.length} of 4 picked`}
               </div>
             </div>
 
-            {/* Clear Extra Dish Notice when base starters, mains, or dessert are picked */}
+            {/* Clear Extra Dish Notice when base starters or mains are picked */}
             {((activeCourse === 'starter' && startersSelected >= MENU_PRICING.requiredStarters) ||
-              (activeCourse === 'main' && mainsSelected >= MENU_PRICING.requiredMains) ||
-              (activeCourse === 'dessert' && dessertSelected >= MENU_PRICING.requiredDesserts)) && (
+              (activeCourse === 'main' && mainsSelected >= MENU_PRICING.requiredMains)) && (
               <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-950 flex items-start gap-2.5">
                 <Info className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold">
-                    {activeCourse === 'dessert'
-                      ? '1 dessert included at £28/adult. '
-                      : `4 ${activeCourse === 'starter' ? 'starters' : 'mains'} included at £28/adult. `}
+                    {`4 ${activeCourse === 'starter' ? 'starters' : 'mains'} included at £28/adult. `}
                   </span>
                   <span>
-                    {activeCourse === 'dessert'
-                      ? 'Want to add a 2nd dessert? It costs '
-                      : `Want to add a 5th ${activeCourse === 'starter' ? 'starter' : 'main'}? It costs `}
+                    {`Want to add a 5th ${activeCourse === 'starter' ? 'starter' : 'main'}? It costs `}
                     <strong>£1.00 extra per person</strong> and updates your total automatically.
                   </span>
                 </div>
